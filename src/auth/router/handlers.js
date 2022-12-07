@@ -9,7 +9,7 @@ async function handleSignup(req, res, next) {
       user: userRecord,
       token: userRecord.token,
     };
-    res.status(200).json(output);
+    res.status(200).send(output);
   } catch (e) {
     console.error(e);
     next(e);
@@ -18,11 +18,12 @@ async function handleSignup(req, res, next) {
 
 async function handleSignin(req, res, next) {
   try {
+    console.log('-------HELLO----------');
     const user = {
       user: req.user,
       token: req.user.token,
     };
-    res.status(200).json(user);
+    res.status(200).send(user);
   } catch (e) {
     console.error(e);
     next(e);
@@ -31,9 +32,9 @@ async function handleSignin(req, res, next) {
 
 async function handleGetUsers(req, res, next) {
   try {
-    const userRecords = await Users.findAll({});
+    const userRecords = await users.findAll({});
     const list = users.map(user => user.username);
-    res.status(200).json(list);
+    res.status(200).send(list);
   } catch (e) {
     console.error(e);
     next(e);

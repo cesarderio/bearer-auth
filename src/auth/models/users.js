@@ -20,31 +20,31 @@ const usersSchema = (sequelizeDatabase, DataTypes) => {
     token: {
       type: DataTypes.VIRTUAL,
       get() {
-        return jwt.sign({ username: this.username });
+        return jwt.sign({ username: this.username }, SECRET);
       },
     },
   });
 
   user.beforeCreate(async (user) => {
-    let hashedPass = bcrypt.hash(user.password, 10);
+    let hashedPass = await bcrypt.hash(user.password, 10);
     user.password = hashedPass;
   });
 
   // Basic AUTH: Validating strings (username, password)
   user.authenticateBasic = async function (username, password) {
     const user = await this.findOne({where: {username} });
-    console.log('HELLLLLOOOOOOOOOOOOO', user.password);
+    // console.log('HELLLLLOOOOOOOOOOOOO', user.password);
     const valid = await bcrypt.compare(password, user.password);
-    console.log('HELLOOOOOO WORLD', valid);
+    // console.log('HELLOOOOOO WORLD', valid);
     if (valid) { return user; }
     throw new Error('Invalid User');
   };
 
   // Bearer AUTH: Validating a token
-  user.authenticateToken = async(token) => {
+  user.authenticateWithToken = async function(token) {
     try {
       let parsedToken = jwt.verify(token, SECRET);
-      let user = this.findOne({where: { username: parsedToken.username }});
+      let user = await this.findOne({where: { username: parsedToken.username }});
       if(user){
         return user;
       }
